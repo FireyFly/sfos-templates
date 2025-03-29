@@ -12,14 +12,13 @@
 # The name of your application
 TARGET = %{ProjectName}
 
-CONFIG += sailfishapp
-
-SOURCES += src/%{ProjectName}.cpp
+CONFIG += sailfishapp_qml
 
 DISTFILES += qml/%{ProjectName}.qml \\
     qml/cover/CoverPage.qml \\
     qml/pages/FirstPage.qml \\
     qml/pages/SecondPage.qml \\
+    src/*.rs \
     rpm/%{ProjectName}.changes.in \\
     rpm/%{ProjectName}.changes.run.in \\
     rpm/%{ProjectName}.spec \\

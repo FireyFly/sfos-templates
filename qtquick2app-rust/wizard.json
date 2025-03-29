@@ -141,8 +141,12 @@
                     "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
-                    "source": "src/template.cpp",
-                    "target": "src/%{ProjectName}.cpp"
+                    "source": "Cargo.toml",
+                    "target": "Cargo.toml"
+                },
+                {
+                    "source": "src/main.rs",
+                    "target": "src/main.rs"
                 },
                 {
                     "source": "template.desktop",
@@ -192,6 +196,9 @@
                 {
                     "source": "rpm/template.changes.run.in",
                     "target": "rpm/%{ProjectName}.changes.run.in"
+                },
+                    "source": "rpm/rust_build.inc",
+                    "target": "rpm/rust_build.inc"
                 },
                 {
                     "source": "translations/template.ts",
