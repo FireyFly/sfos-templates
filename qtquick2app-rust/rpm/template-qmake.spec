@@ -52,8 +52,8 @@ cargo build \
 
 # Install executable
 install -D \
-  %{_sourcedir}/../target/%{SB2_TARGET}/release/%{ProjectName} \
-  %{buildroot}%{_bindir}/%{ProjectName}
+  %{_sourcedir}/../target/%{SB2_TARGET}/release/%{name} \
+  %{buildroot}%{_bindir}/%{name}
 
 # Desktop file
 desktop-file-install \
@@ -61,12 +61,12 @@ desktop-file-install \
    %{name}.desktop
 
 # Translation files
-install -d %{buildroot}%{_datadir}/%{ProjectName}/translations
+install -d %{buildroot}%{_datadir}/%{name}/translations
 for filename in %{_sourcedir}/../translations/*.ts; do
     base=$(basename -s .ts $filename)
     lrelease \
         -idbased "%{_sourcedir}/../translations/$base.ts" \
-        -qm "%{buildroot}%{_datadir}/%{ProjectName}/translations/$base.qm";
+        -qm "%{buildroot}%{_datadir}/%{name}/translations/$base.qm";
 done
 
 # Application icons
