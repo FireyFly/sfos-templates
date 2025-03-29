@@ -15,7 +15,6 @@
     [
         { "key": "ProjectFile", "value": "%{JS: '%{BuildSystem}' === 'cmake' ? '%{CMakeFile}' : '%{ProFile}'}" },
         { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
-        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
         { "key": "SpectacleBuilder", "value": "%{JS: '%{BuildSystem}' === 'cmake' ? 'cmake' : 'qmake5'}" },
         { "key": "ApplicationName", "value": "%{JS: '%{ProjectName}'.replace(/^harbour-/, '')}" }
     ],
@@ -82,11 +81,6 @@
                                 "trKey": "qmake",
                                 "value": "qmake",
                                 "condition": "%{JS: [ %{Plugins} ].indexOf('QmakeProjectManager') >= 0}"
-                            },
-                            {
-                                "trKey": "CMake",
-                                "value": "cmake",
-                                "condition": "%{JS: [ %{Plugins} ].indexOf('CMakeProjectManager') >= 0}"
                             }
                         ]
                     }
@@ -119,11 +113,6 @@
                     "target": "%{ProFile}",
                     "openAsProject": true,
                     "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
-                },
-                {
-                    "source": "CMakeLists.txt",
-                    "openAsProject": true,
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
                 },
                 {
                     "source": "gitattributes",
