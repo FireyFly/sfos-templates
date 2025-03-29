@@ -186,8 +186,8 @@
                     "source": "rpm/template.changes.run.in",
                     "target": "rpm/%{ProjectName}.changes.run.in"
                 },
-                    "source": "rpm/rust_build.inc",
-                    "target": "rpm/rust_build.inc"
+                    "source": "rpm/rust_env.inc",
+                    "target": "rpm/rust_env.inc"
                 },
                 {
                     "source": "translations/template.ts",

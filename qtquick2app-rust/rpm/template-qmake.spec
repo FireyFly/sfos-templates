@@ -23,29 +23,44 @@ BuildRequires:  rust-std-static
 %prep
 %setup -q -n %{name}-%{version}
 
+# https://github.com/sailfishos/gecko-dev/blob/master/rpm/xulrunner-qt5.spec#L263-L271
+# (adapted to use across phases)
+%ifarch %arm32
+%global SB2_TARGET armv7-unknown-linux-gnueabihf
+%endif
+%ifarch %arm64
+%global SB2_TARGET aarch64-unknown-linux-gnu
+%endif
+%ifarch %ix86
+%global SB2_TARGET i686-unknown-linux-gnu
+%endif
+
 
 %build
-%qmake5
 
-%include rpm/rust_build.inc
+%include rpm/rust_env.inc
 
-
-%make_build
+# -j 1: https://forum.sailfishos.org/t/rust-howto-request/3187/52
+# dropped for now, but might have to be restored if this is still a problem
+cargo build \
+  --verbose \
+  --release \
+  --manifest-path %{_sourcedir}/../Cargo.toml
 
 
 %install
-%qmake5_install
 
-%ifarch %arm
-targetdir=%{_sourcedir}/../target/armv7-unknown-linux-gnueabihf/release/
-%endif
-%ifarch aarch64
-targetdir=%{_sourcedir}/../target/aarch64-unknown-linux-gnu/release/
-%endif
-%ifarch %ix86
-targetdir=%{_sourcedir}/../target/i686-unknown-linux-gnu/release/
-%endif
+# Install executable
+install -D \
+  %{_sourcedir}/../target/%{SB2_TARGET}/release/%{ProjectName} \
+  %{buildroot}%{_bindir}/%{ProjectName}
 
+# Desktop file
+desktop-file-install \
+  --dir %{buildroot}%{_datadir}/applications \
+   %{name}.desktop
+
+# Translation files
 install -d %{buildroot}%{_datadir}/%{ProjectName}/translations
 for filename in %{_sourcedir}/../translations/*.ts; do
     base=$(basename -s .ts $filename)
@@ -54,11 +69,16 @@ for filename in %{_sourcedir}/../translations/*.ts; do
         -qm "%{buildroot}%{_datadir}/%{ProjectName}/translations/$base.qm";
 done
 
-install -D $targetdir/%{ProjectName} %{buildroot}%{_bindir}/%{ProjectName}
+# Application icons
+for RES in 86x86 108x108 128x128 172x172; do
+    install -Dm 644 \
+        icons/${RES}/%{name}.png \
+        %{buildroot}%{_datadir}/icons/hicolor/${RES}/apps/%{name}.png
+done
 
-desktop-file-install --delete-original       \
-  --dir %{buildroot}%{_datadir}/applications             \
-   %{buildroot}%{_datadir}/applications/*.desktop
+# QML files
+find ./qml -type f -exec \
+    install -Dm 644 "{}" "%{buildroot}%{_datadir}/%{name}/{}" \;
 
 
 %files
