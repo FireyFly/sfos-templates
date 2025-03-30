@@ -2,8 +2,6 @@ use qmetaobject::prelude::*;
 use sailors::sailfishapp::QmlApp;
 
 fn main() {
-    env_logger::init();
-
     let mut app = QmlApp::application("%{ProjectName}".into());
     let version: QString = env!("CARGO_PKG_VERSION").into();
 
