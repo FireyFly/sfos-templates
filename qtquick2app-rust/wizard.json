@@ -186,8 +186,13 @@
                     "source": "rpm/template.changes.run.in",
                     "target": "rpm/%{ProjectName}.changes.run.in"
                 },
-                    "source": "rpm/rust_env.inc",
-                    "target": "rpm/rust_env.inc"
+                {
+                    "source": "rpm/macros.rust",
+                    "target": "rpm/macros.rust"
+                },
+                {
+                    "source": "rpm/macros.share",
+                    "target": "rpm/macros.share"
                 },
                 {
                     "source": "translations/template.ts",

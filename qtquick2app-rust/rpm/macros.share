@@ -1,0 +1,20 @@
+
+%install_desktop() \
+    desktop-file-install --dir %{buildroot}%{_desktopdir} %{1}
+
+%install_app_icons() \
+    for RES in $(ls icons); do \
+        install -Dm 644 icons/${RES}/%{name}.png %{buildroot}%{_iconsbasedir}/${RES}/apps/%{name}.png \
+    done
+
+%install_translations() \
+    install -d %{buildroot}%{_datadir}/%{name}/translations \
+    for filename in %{_sourcedir}/../translations/*.ts; do \
+        base=$(basename -s .ts $filename) \
+        lrelease -idbased "%{_sourcedir}/../translations/$base.ts" -qm "%{buildroot}%{_datadir}/%{name}/translations/$base.qm" \
+    done
+
+%install_data_dir() \
+    find %{1} -type f -exec install -Dm 644 "{}" "%{buildroot}%{_datadir}/%{name}/{}" ';'
+
+# vim: set ft=spec:
