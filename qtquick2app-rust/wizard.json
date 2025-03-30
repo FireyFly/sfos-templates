@@ -3,8 +3,8 @@
     "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject", "Qt4ProjectManager.Qt4Project" ],
     "id": "Q.SailfishOSQtQuick2Application",
     "category": "F.Application",
-    "trDescription": "Creates a Sailfish OS Qt Quick Application using Sailfish Silica components.",
-    "trDisplayName": "Sailfish OS Qt Quick Application",
+    "trDescription": "Creates a Sailfish OS Qt Quick Application in Rust (untested from within QtCreator)",
+    "trDisplayName": "Sailfish OS Qt Quick Application (Rust)",
     "trDisplayCategory": "Application",
     "icon": "icon.png",
     "featuresRequired": [ "Mer.Wizard.Feature.SailfishOS" ],
@@ -13,9 +13,8 @@
 
     "options":
     [
-        { "key": "ProjectFile", "value": "%{JS: '%{BuildSystem}' === 'cmake' ? '%{CMakeFile}' : '%{ProFile}'}" },
-        { "key": "ProFile", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
-        { "key": "SpectacleBuilder", "value": "%{JS: '%{BuildSystem}' === 'cmake' ? 'cmake' : 'qmake5'}" },
+        { "key": "ProjectFile", "value": "%{ProjectDirectory}/%{ProjectName}/Cargo.toml" },
+        { "key": "SpectacleBuilder", "value": "qmake5" },
         { "key": "ApplicationName", "value": "%{JS: '%{ProjectName}'.replace(/^harbour-/, '')}" }
     ],
 
@@ -34,8 +33,6 @@
             [
                 {
                     "name": "Summary",
-                    "trDisplayName": "Summary:",
-                    "type": "LineEdit",
                     "data":
                     {
                         "trText": "My Sailfish OS Application"
@@ -78,9 +75,8 @@
                         "items":
                         [
                             {
-                                "trKey": "qmake",
-                                "value": "qmake",
-                                "condition": "%{JS: [ %{Plugins} ].indexOf('QmakeProjectManager') >= 0}"
+                                "trKey": "cargo",
+                                "value": "cargo"
                             }
                         ]
                     }
@@ -109,29 +105,20 @@
             "data":
             [
                 {
-                    "source": "template.pro",
-                    "target": "%{ProFile}",
-                    "openAsProject": true,
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
-                },
-                {
                     "source": "gitattributes",
                     "target": ".gitattributes",
                     "condition": "%{JS: '%{VersionControl}' === 'G.Git'}"
                 },
                 {
-                    "source": "rpm/template-qmake.spec",
+                    "source": "rpm/template.spec",
                     "target": "rpm/%{ProjectName}.spec",
-                    "condition": "%{JS: '%{BuildSystem}' === 'qmake'}"
-                },
-                {
-                    "source": "rpm/template-cmake.spec",
-                    "target": "rpm/%{ProjectName}.spec",
-                    "condition": "%{JS: '%{BuildSystem}' === 'cmake'}"
+                    "condition": "%{JS: '%{BuildSystem}' === 'cargo'}"
                 },
                 {
                     "source": "Cargo.toml",
-                    "target": "Cargo.toml"
+                    "target": "Cargo.toml",
+                    "openAsProject": true,
+                    "condition": "%{JS: '%{BuildSystem}' === 'cargo'}"
                 },
                 {
                     "source": "src/main.rs",
