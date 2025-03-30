@@ -30,7 +30,7 @@ impl QAbstractListModel for MyListModel {
     }
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     let mut app = QmlApp::application("%{ProjectName}".into());
     let version: QString = env!("CARGO_PKG_VERSION").into();
 
@@ -48,5 +48,4 @@ fn main() {
     qmeta_async::run(|| {
         app.exec()
     })
-    .unwrap()
 }
