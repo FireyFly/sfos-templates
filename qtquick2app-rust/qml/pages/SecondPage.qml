@@ -9,7 +9,7 @@ Page {
 
     SilicaListView {
         id: listView
-        model: 20
+        model: MyListModel
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("Nested Page")
@@ -19,7 +19,7 @@ Page {
 
             Label {
                 x: Theme.horizontalPageMargin
-                text: qsTr("Item") + " " + index
+                text: message
                 anchors.verticalCenter: parent.verticalCenter
                 color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
