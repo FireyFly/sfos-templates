@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Initialize a project
 #
@@ -78,6 +78,10 @@ OPTIONS
     --sdk-root <path>
         Path to the (application) SDK installation directory. Only needed if
         custom installation directory was chosen during installation
+
+    --wizards-dir <path>
+        Path to the directory with QtCreator template wizards to read.
+        Overrides the SDK root path.
 END
 }
 
@@ -128,8 +132,10 @@ list_types()
     local template_displayname=
     local wizard_file=
     local builders=()
-    for template in "${DEF_TEMPLATES[@]}"; do
-        wizard_file="$OPT_SDK_ROOT/$DEF_TEMPLATES_PATH/sailfishos-$template/wizard.json"
+    for template in $(ls "$OPT_WIZARDS_DIR"); do
+        wizard_file="$OPT_WIZARDS_DIR/$template/wizard.json"
+        [ -e $wizard_file ] && grep -q '"enabled":.*SailfishOS' $wizard_file || continue
+
         template_displayname=$(grep -Po '"trDisplayName": "\K.*(?=")' "$wizard_file" |head -n 1)
         echo "$template ... $template_displayname"
         builders=()
@@ -228,7 +234,7 @@ parse_wizard_json()
 
 instantiate()
 {
-    local template=$OPT_SDK_ROOT/$DEF_TEMPLATES_PATH/sailfishos-$OPT_TYPE
+    local template=$OPT_WIZARDS_DIR/$OPT_TYPE
 
     if [[ ! -f $template/wizard.json ]]; then
         bad_usage "Unrecognized project type: $OPT_TYPE"
@@ -249,7 +255,6 @@ instantiate()
 set_defaults()
 {
     DEF_TEMPLATES_PATH=share/qtcreator/templates/wizards/
-    DEF_TEMPLATES=(qtquick2app qtquick2app-qmlonly)
     DEF_BUILDERS=(qmake cmake)
     DEF_BUILDER=qmake
 
@@ -269,6 +274,8 @@ set_defaults()
     else
         OPT_SDK_ROOT=$HOME/SailfishOS
     fi
+
+    OPT_WIZARDS_DIR="$OPT_SDK_ROOT/$DEF_TEMPLATES_PATH"
 }
 
 parse_opts()
@@ -292,6 +299,17 @@ parse_opts()
                 OPT_LIST_TYPES=1
                 break
                 ;;
+            --wizards-dir)
+                if [[ ! ${2:-} ]]; then
+                    bad_usage "Option requires an argument: $1"
+                    return 1
+                elif [[ ! -d $2 ]]; then
+                    bad_usage "Not a directory: $2"
+                    return 1
+                fi
+                OPT_WIZARDS_DIR=$2
+                shift
+                ;;
             --sdk-root)
                 if [[ ! ${2:-} ]]; then
                     bad_usage "Option requires an argument: $1"
@@ -304,6 +322,7 @@ parse_opts()
                     return 1
                 fi
                 OPT_SDK_ROOT=$2
+                OPT_WIZARDS_DIR="$OPT_SDK_ROOT/$DEF_TEMPLATES_PATH"
                 shift
                 ;;
             -t|--type)
@@ -337,10 +356,13 @@ parse_opts()
         shift
     done
 
-    if [[ ! -f $OPT_SDK_ROOT/sdk-release ]]; then
-        bad_usage "The (application) SDK is not available from the default location" \
-            "'$OPT_SDK_ROOT'. Please use the '--sdk-root' option."
-        return 1
+    if [[ "$OPT_WIZARDS_DIR" == "$OPT_SDK_ROOT/$DEF_TEMPLATES_PATH" ]]; then
+        # Only check SDK root if --wizards-dir wasn't overridden
+        if [[ ! -f $OPT_SDK_ROOT/sdk-release ]]; then
+            bad_usage "The (application) SDK is not available from the default location" \
+                "'$OPT_SDK_ROOT'. Please use the '--sdk-root' option."
+            return 1
+        fi
     fi
 
     if [[ $OPT_LIST_TYPES && $OPT_TYPE ]]; then
